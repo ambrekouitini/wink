@@ -5,6 +5,10 @@
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
+// Colors for contrast
+const tintColorYellow = '#fbfa68';
+const tintColorBlue = '#9ae9fe';
+
 
 export const Colors = {
   light: {
@@ -22,5 +26,9 @@ export const Colors = {
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
+  },
+  additionalColors: {
+    yellow: tintColorYellow,
+    blue: tintColorBlue,
   },
 };

@@ -168,7 +168,7 @@ export default function CreateEvent() {
         ]);
         } catch (error: any) {
             console.error('Error creating event:', error);
-            Alert.alert('Erreur', error.message || 'Une erreur est survenue');
+        Alert.alert('Erreur', error.message || 'Une erreur est survenue');
         } finally {
         setLoading(false);
         }
