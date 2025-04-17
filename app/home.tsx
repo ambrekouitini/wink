@@ -73,7 +73,6 @@ export default function Home() {
     const { data, error } = await supabase
       .from("events")
       .select("*")
-      // .eq("owner_id", userId)
       .order("created_at", { ascending: false });
 
     if (error) {

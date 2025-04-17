@@ -31,6 +31,10 @@ function StackNavigator() {
       <Stack.Screen name="event/[id]" options={{ 
         title: 'Détails de l\'événement',
       }} />
+      <Stack.Screen name="event/[id]/participate" options={{ 
+        title: 'Participer',
+        headerShown: false
+      }} />
     </Stack>
   );
 }
