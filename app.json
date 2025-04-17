@@ -2,20 +2,48 @@
   "expo": {
     "name": "wink",
     "slug": "wink",
+    "scheme": "planify",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "packages": "com.anonymous.wink",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": {
+            "scheme": "planify",
+            "host": "wink",
+            "pathPrefix": "/"
+          },
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "data": {
+            "scheme": "planify",
+            "host": "wink",
+            "pathPrefix": "/"
+          },
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.wink"
     },
     "web": {
       "bundler": "metro",

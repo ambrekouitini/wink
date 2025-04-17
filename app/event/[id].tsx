@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Touchable, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { supabase } from '../../lib/supabase';
+import * as Clipboard from 'expo-clipboard';
+import { Alert } from 'react-native';
+
 
 interface Event {
   id: string;
@@ -16,6 +19,17 @@ export default function EventDetails() {
   const { id } = useLocalSearchParams();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+
+
+  const generateDeepLink = (eventId: string) => {
+    return `planify://event/${eventId}`;
+  };
+  const copyToClipboard = (eventId: string) => {
+    const link = generateDeepLink(eventId);
+    Clipboard.setStringAsync(link);
+    Alert.alert('Lien copié', 'Le lien de l’événement a été copié dans le presse-papiers.');
+  };
+  
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -71,6 +85,12 @@ export default function EventDetails() {
       <Text style={styles.text}>
         {new Date(event.created_at).toLocaleString()}
       </Text>
+      <TouchableOpacity onPress={() => copyToClipboard(event.id)}>
+        <Text style={{ color: 'blue', marginTop: 10 }}>
+          Copier le lien de l’événement
+        </Text>
+      </TouchableOpacity>
+
     </ScrollView>
   );
 }
