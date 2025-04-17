@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert, FlatList } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import { User } from '@supabase/supabase-js';
 
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  proposed_dates: string[];
+  created_at: string;
+}
+
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
-  const [userName, setUserName] = useState<string>('');
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -16,7 +26,7 @@ export default function Home() {
         router.replace('/');
         return;
       }
-      
+
       setUser(data.session.user);
       
       if (data.session.user.user_metadata && data.session.user.user_metadata.name) {
@@ -26,6 +36,27 @@ export default function Home() {
 
     checkUser();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+    }
+  }, [user]);
+
+  const fetchUserEvents = async (userId: string) => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('owner_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Erreur lors du fetch des events:', error);
+    } else {
+      setEvents(data || []);
+    }
+    setLoading(false);
+  };
 
   const handleLogout = async () => {
     try {
@@ -42,7 +73,11 @@ export default function Home() {
     router.push('/event/create');
   };
 
-  if (!user) {
+  const navigateToCreateEvent = () => {
+    router.push('/event/create');
+  };
+
+  if (!user ) {
     return (
       <View style={styles.container}>
         <Text>Chargement...</Text>
@@ -130,7 +165,13 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     backgroundColor: '#000',
     alignItems: 'center',
-    justifyContent: 'center',
+  },
+  logout: {
+    backgroundColor: '#dc3545',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   floatingButtonText: {
     color: '#fff',

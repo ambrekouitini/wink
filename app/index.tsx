@@ -43,33 +43,43 @@ export default function Auth() {
   };
 
   const handleSignUp = async () => {
-    if (!email || !password) {
+    if (!email || !password || !name) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
-
+  
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signUp({
+      
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            name: name,
-          },
-        }
+          data: { name },
+        },
       });
-
+  
       if (error) throw error;
-      
+  
+      const user = data?.user ?? data?.session?.user;
+  
+      if (user) {
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([{ id: user.id, name, email }]);
+  
+        if (insertError) throw insertError;
+      }
+  
       router.replace('/home');
     } catch (error: any) {
       Alert.alert('Erreur d\'inscription', error.message || 'Une erreur est survenue');
+      console.error('Sign up error:', error);
     } finally {
       setLoading(false);
     }
   };
-
+  
   const handleForgotPassword = async () => {
     if (!email) {
       Alert.alert('Erreur', 'Veuillez entrer votre email');
