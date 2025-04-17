@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  TextInput, 
-  TouchableOpacity, 
-  KeyboardAvoidingView, 
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
   ActivityIndicator,
-  Alert 
-} from 'react-native';
-import { router } from 'expo-router';
-import { supabase } from '../lib/supabase';
+  Alert,
+} from "react-native";
+import { router } from "expo-router";
+import { supabase } from "../lib/supabase";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      Alert.alert("Erreur", "Veuillez remplir tous les champs");
       return;
     }
 
@@ -33,10 +33,13 @@ export default function Auth() {
       });
 
       if (error) throw error;
-      
-      router.replace('/home');
+
+      router.replace("/home");
     } catch (error: any) {
-      Alert.alert('Erreur de connexion', error.message || 'Une erreur est survenue');
+      Alert.alert(
+        "Erreur de connexion",
+        error.message || "Une erreur est survenue"
+      );
     } finally {
       setLoading(false);
     }
@@ -44,13 +47,13 @@ export default function Auth() {
 
   const handleSignUp = async () => {
     if (!email || !password || !name) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      Alert.alert("Erreur", "Veuillez remplir tous les champs");
       return;
     }
-  
+
     try {
       setLoading(true);
-      
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -58,43 +61,46 @@ export default function Auth() {
           data: { name },
         },
       });
-  
+
       if (error) throw error;
-  
+
       const user = data?.user ?? data?.session?.user;
-  
+
       if (user) {
         const { error: insertError } = await supabase
-          .from('users')
+          .from("users")
           .insert([{ id: user.id, name, email }]);
-  
+
         if (insertError) throw insertError;
       }
-  
-      router.replace('/home');
+
+      router.replace("/home");
     } catch (error: any) {
-      Alert.alert('Erreur d\'inscription', error.message || 'Une erreur est survenue');
-      console.error('Sign up error:', error);
+      Alert.alert(
+        "Erreur d'inscription",
+        error.message || "Une erreur est survenue"
+      );
+      console.error("Sign up error:", error);
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleForgotPassword = async () => {
     if (!email) {
-      Alert.alert('Erreur', 'Veuillez entrer votre email');
+      Alert.alert("Erreur", "Veuillez entrer votre email");
       return;
     }
 
     try {
       setLoading(true);
       const { error } = await supabase.auth.resetPasswordForEmail(email);
-      
+
       if (error) throw error;
-      
-      Alert.alert('Email envoyé', 'Veuillez vérifier votre boîte de réception');
+
+      Alert.alert("Email envoyé", "Veuillez vérifier votre boîte de réception");
     } catch (error: any) {
-      Alert.alert('Erreur', error.message || 'Une erreur est survenue');
+      Alert.alert("Erreur", error.message || "Une erreur est survenue");
     } finally {
       setLoading(false);
     }
@@ -104,7 +110,7 @@ export default function Auth() {
     <KeyboardAvoidingView style={styles.container}>
       <View>
         <Text style={styles.title}>Planify</Text>
-        
+
         <View style={styles.tabContainer}>
           <TouchableOpacity onPress={() => setIsLogin(true)}>
             <Text>Connexion</Text>
@@ -131,7 +137,7 @@ export default function Auth() {
           keyboardType="email-address"
           autoCapitalize="none"
         />
-        
+
         <TextInput
           style={styles.input}
           placeholder="Mot de passe"
@@ -143,12 +149,12 @@ export default function Auth() {
         {loading ? (
           <ActivityIndicator size="large" color="#000" />
         ) : (
-          <TouchableOpacity 
-            style={styles.button} 
+          <TouchableOpacity
+            style={styles.button}
             onPress={isLogin ? handleLogin : handleSignUp}
           >
             <Text style={styles.buttonText}>
-              {isLogin ? 'Se connecter' : 'S\'inscrire'}
+              {isLogin ? "Se connecter" : "S'inscrire"}
             </Text>
           </TouchableOpacity>
         )}
@@ -166,33 +172,33 @@ export default function Auth() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     padding: 20,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
   },
   tabContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 15,
     gap: 20,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     padding: 10,
     marginVertical: 10,
-    width: '100%',
+    width: "100%",
   },
   button: {
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     padding: 15,
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 10,
   },
   buttonText: {
-    color: 'white',
+    color: "white",
   },
 });
