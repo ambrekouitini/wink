@@ -93,7 +93,7 @@ export default function Auth() {
   return (
     <KeyboardAvoidingView style={styles.container}>
       <View>
-        <Text style={styles.title}>Planify</Text>
+        <Text style={styles.title}>WinK</Text>
         
         <View style={styles.tabContainer}>
           <TouchableOpacity onPress={() => setIsLogin(true)}>
