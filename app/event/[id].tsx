@@ -14,6 +14,9 @@ import { ThemeContext } from '../../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 const BAR_WIDTH = (width - 80) / 5;
+import * as Clipboard from 'expo-clipboard';
+import { Alert } from 'react-native';
+
 
 type Event = {
   id: string;
@@ -48,6 +51,28 @@ export default function EventDetails() {
     text: isDark ? '#FFFFFF' : '#000000',
     border: isDark ? '#333333' : '#DDDDDD',
   };
+
+
+  const generateDeepLink = (eventId: string) => {
+    return `planify://event/${eventId}`;
+  };
+  const copyToClipboard = (eventId: string) => {
+    const link = generateDeepLink(eventId);
+    Clipboard.setStringAsync(link);
+    Alert.alert('Lien copié', 'Le lien de l’événement a été copié dans le presse-papiers.');
+  };
+  
+
+
+  const generateDeepLink = (eventId: string) => {
+    return `planify://event/${eventId}`;
+  };
+  const copyToClipboard = (eventId: string) => {
+    const link = generateDeepLink(eventId);
+    Clipboard.setStringAsync(link);
+    Alert.alert('Lien copié', 'Le lien de l’événement a été copié dans le presse-papiers.');
+  };
+  
 
   useEffect(() => {
     const fetchData = async () => {
