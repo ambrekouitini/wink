@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Touchable, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import * as Clipboard from 'expo-clipboard';
-import { Alert } from 'react-native';
-
 
 interface Event {
   id: string;
@@ -20,16 +26,13 @@ export default function EventDetails() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const generateDeepLink = (eventId: string) => `planify://event/${eventId}`;
 
-  const generateDeepLink = (eventId: string) => {
-    return `planify://event/${eventId}`;
-  };
   const copyToClipboard = (eventId: string) => {
     const link = generateDeepLink(eventId);
     Clipboard.setStringAsync(link);
-    Alert.alert('Lien copié', 'Le lien de l’événement a été copié dans le presse-papiers.');
+    Alert.alert('Lien copié', 'Le lien de l’événement a été copié.');
   };
-  
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -40,7 +43,7 @@ export default function EventDetails() {
         .single();
 
       if (error) {
-        console.error("Erreur lors de la récupération de l'événement :", error);
+        console.error("Erreur récupération event :", error);
       } else {
         setEvent(data);
       }
@@ -52,76 +55,115 @@ export default function EventDetails() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View style={styles.centered}>
         <ActivityIndicator size="large" color="#000" />
-        <Text>Chargement de l'événement...</Text>
+        <Text style={styles.loadingText}>Chargement...</Text>
       </View>
     );
   }
 
   if (!event) {
     return (
-      <View style={styles.center}>
-        <Text>Aucun événement trouvé.</Text>
+      <View style={styles.centered}>
+        <Text style={styles.emptyText}>Événement introuvable.</Text>
       </View>
     );
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>{event.title}</Text>
-      <Text style={styles.label}>Description :</Text>
-      <Text style={styles.text}>{event.description || 'Aucune description.'}</Text>
+      <View style={styles.card}>
+        <Text style={styles.title}>{event.title}</Text>
 
-      <Text style={styles.label}>Lieu :</Text>
-      <Text style={styles.text}>{event.location}</Text>
+        <Text style={styles.sectionLabel}>📍 Lieu</Text>
+        <Text style={styles.sectionText}>{event.location}</Text>
 
-      <Text style={styles.label}>Dates proposées :</Text>
-      {event.proposed_dates.map((date, index) => (
-        <Text key={index} style={styles.date}>{new Date(date).toLocaleDateString()}</Text>
-      ))}
+        {event.description && (
+          <>
+            <Text style={styles.sectionLabel}>📝 Description</Text>
+            <Text style={styles.sectionText}>{event.description}</Text>
+          </>
+        )}
 
-      <Text style={styles.label}>Créé le :</Text>
-      <Text style={styles.text}>
-        {new Date(event.created_at).toLocaleString()}
-      </Text>
-      <TouchableOpacity onPress={() => copyToClipboard(event.id)}>
-        <Text style={{ color: 'blue', marginTop: 10 }}>
-          Copier le lien de l’événement
+        <Text style={styles.sectionLabel}>🗓️ Dates proposées</Text>
+        {event.proposed_dates.map((date, index) => (
+          <Text key={index} style={styles.sectionText}>
+            {new Date(date).toLocaleDateString()}
+          </Text>
+        ))}
+
+        <Text style={styles.sectionLabel}>🕓 Créé le</Text>
+        <Text style={styles.sectionText}>
+          {new Date(event.created_at).toLocaleString()}
         </Text>
-      </TouchableOpacity>
 
+        <TouchableOpacity style={styles.copyButton} onPress={() => copyToClipboard(event.id)}>
+          <Text style={styles.copyButtonText}>Copier le lien de l’événement</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: 24,
+    backgroundColor: "#f9f9f9",
+    flexGrow: 1,
   },
-  center: {
+  centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    backgroundColor: "#f9f9f9",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#888",
+  },
+  emptyText: {
+    fontSize: 18,
+    color: "#999",
+  },
+  card: {
+    backgroundColor: "#fff",
+    padding: 24,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#eee",
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: "bold",
     marginBottom: 20,
+    textAlign: "center",
   },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  text: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  date: {
-    fontSize: 16,
-    marginLeft: 10,
+  sectionLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: 16,
     marginBottom: 4,
+    color: "#333",
+  },
+  sectionText: {
+    fontSize: 16,
+    color: "#444",
+  },
+  copyButton: {
+    marginTop: 24,
+    backgroundColor: "#000",
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  copyButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });

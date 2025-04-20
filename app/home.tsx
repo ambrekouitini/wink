@@ -51,9 +51,7 @@ export default function Home() {
       if (userError) {
         console.error("Erreur récupération du nom :", userError.message);
       } else if (userData.length === 0) {
-        console.warn(
-          "Aucun utilisateur trouvé dans la table users avec cet ID."
-        );
+        console.warn("Aucun utilisateur trouvé dans la table users avec cet ID.");
       } else {
         setUserName(userData[0].name);
       }
@@ -73,7 +71,6 @@ export default function Home() {
     const { data, error } = await supabase
       .from("events")
       .select("*")
-      // .eq("owner_id", userId)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -88,7 +85,6 @@ export default function Home() {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-
       router.replace("/");
     } catch (error: any) {
       Alert.alert("Erreur", error.message || "Une erreur est survenue");
@@ -103,38 +99,42 @@ export default function Home() {
     <View style={styles.container}>
       <Text style={styles.title}>Bienvenue sur WinK</Text>
       <Text style={styles.subtitle}>
-        Connecté en tant que: {userName || user?.email || "Invité"}
+        Connecté en tant que : {userName || user?.email || "Invité"}
       </Text>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={navigateToCreateEvent}>
-          <Text style={styles.buttonText}>Créer un événement</Text>
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={navigateToCreateEvent}>
+        <Text style={styles.buttonText}>Créer un événement</Text>
+      </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Mes événements</Text>
-        </TouchableOpacity>
-        <FlatList
-          data={events}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => router.push(`/event/${item.id}`)}>
+      <Text style={styles.sectionTitle}>Événements récents</Text>
+
+      <FlatList
+        data={events}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => router.push(`/event/${item.id}`)}>
             <View style={styles.eventCard}>
               <Text style={styles.eventTitle}>{item.title}</Text>
-              <Text>{item.description}</Text>
-              <Text>{item.location}</Text>
-              <Text>Proposé pour : {item.proposed_dates.join(", ")}</Text>
-              <Text>{item.id}</Text>
+              <Text style={styles.eventInfo}>{item.description}</Text>
+              <Text style={styles.eventInfo}>{item.location}</Text>
+              {item.proposed_dates.length > 0 && (
+                <Text style={styles.eventDate}> 
+                  {new Date(item.proposed_dates[0]).toLocaleDateString()}
+                </Text>
+              )}
             </View>
-            </TouchableOpacity>
-          )}
-          ListEmptyComponent={<Text>Aucun événement trouvé.</Text>}
-        />
+          </TouchableOpacity>
+        )}
+        ListEmptyComponent={() =>
+          !loading ? (
+            <Text style={styles.emptyText}>Aucun événement trouvé.</Text>
+          ) : null
+        }
+      />
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.buttonText}>Se déconnecter</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Se déconnecter</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.floatingButton}
@@ -149,37 +149,81 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
-    padding: 20,
+    backgroundColor: "#ffffff",
+    paddingHorizontal: 20,
+    paddingTop: 60,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginTop: 40,
-    marginBottom: 10,
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#111",
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
+    color: "#666",
     marginBottom: 30,
   },
-  buttonContainer: {
-    gap: 10,
-  },
   button: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 5,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
+    backgroundColor: "#111",
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111",
+    marginBottom: 15,
+  },
+  eventCard: {
+    backgroundColor: "#fafafa",
+    padding: 16,
+    borderRadius: 10,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  eventTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111",
+    marginBottom: 4,
+  },
+  eventInfo: {
+    fontSize: 14,
+    color: "#444",
+    marginBottom: 4,
+  },
+  eventDate: {
+    fontSize: 13,
+    color: "#777",
+  },
+  emptyText: {
+    color: "#999",
+    fontStyle: "italic",
+    textAlign: "center",
+    marginTop: 20,
   },
   logoutButton: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 20,
-    borderWidth: 1,
-    borderColor: "#ddd",
+    backgroundColor: "#eaeaea",
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 30,
+  },
+  logoutText: {
+    color: "#111",
+    fontWeight: "600",
   },
   floatingButton: {
     position: "absolute",
@@ -188,32 +232,18 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "#000",
+    backgroundColor: "#111",
     alignItems: "center",
     justifyContent: "center",
-  },
-  logout: {
-    backgroundColor: "#dc3545",
-  },
-  buttonText: {
-    color: "black",
-    fontWeight: "bold",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   floatingButtonText: {
     color: "#fff",
-    fontSize: 24,
-  },
-  eventCard: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderColor: "#ddd",
-    borderWidth: 1,
-  },
-  eventTitle: {
+    fontSize: 28,
     fontWeight: "bold",
-    fontSize: 16,
-    marginBottom: 5,
   },
 });
