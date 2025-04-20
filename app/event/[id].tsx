@@ -64,14 +64,6 @@ export default function EventDetails() {
   
 
 
-  const generateDeepLink = (eventId: string) => {
-    return `planify://event/${eventId}`;
-  };
-  const copyToClipboard = (eventId: string) => {
-    const link = generateDeepLink(eventId);
-    Clipboard.setStringAsync(link);
-    Alert.alert('Lien copié', 'Le lien de l’événement a été copié dans le presse-papiers.');
-  };
   
 
   useEffect(() => {
@@ -248,6 +240,13 @@ export default function EventDetails() {
             <Text style={[styles.locationText, { color: theme.text }]}>{event.location}</Text>
           </View>
         )}
+        <TouchableOpacity style={[styles.participateButton, { 
+              backgroundColor: isDark ? '#ffffff' : '#000000'
+            }]}>
+            <Text style={[styles.participateButtonText, {
+              color: isDark ? '#000000' : '#ffffff'
+            }]} onPress={() => copyToClipboard(event.id)}>Copier le lien d'invitation</Text>
+          </TouchableOpacity>
       </View>
 
       <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
@@ -355,6 +354,7 @@ export default function EventDetails() {
               color: isDark ? '#000000' : '#ffffff'
             }]}>Je participe</Text>
           </TouchableOpacity>
+          
         )}
       </View>
     </ScrollView>

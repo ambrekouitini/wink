@@ -14,26 +14,15 @@ export const linking = {
       home: 'home',
       'event/create': 'event/create',
       'event/[id]': 'event/:id',
+      'event/[id]/participate': 'event/:id/participate',
     },
   },
 };
 
-export default function Layout() {
+function StackNavigator() {
   const { isDark } = useContext(ThemeContext) || { isDark: false };
 
   return (
-    <ThemeProvider>
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF',
-          },
-          headerTintColor: isDark ? '#FFFFFF' : '#000000',
-          contentStyle: {
-            backgroundColor: isDark ? '#121212' : '#F5F5F5',
-          },
-        }}
-      />
     <Stack
       screenOptions={{
         headerStyle: {
@@ -42,26 +31,24 @@ export default function Layout() {
         headerTintColor: isDark ? '#FFFFFF' : '#000000',
         contentStyle: {
           backgroundColor: isDark ? '#121212' : '#F5F5F5',
-        }
+        },
       }}
     >
-      <Stack.Screen name="index" options={{ 
-        headerShown: false 
-      }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="home" options={{ 
         title: 'Planify',
         headerBackVisible: false,
       }} />
       <Stack.Screen name="event/create" options={{ 
         title: 'Créer un événement',
-        headerShown: false
+        headerShown: false,
       }} />
       <Stack.Screen name="event/[id]" options={{ 
-        title: 'Détails de l\'événement',
+        title: "Détails de l'événement",
       }} />
       <Stack.Screen name="event/[id]/participate" options={{ 
         title: 'Participer',
-        headerShown: false
+        headerShown: false,
       }} />
     </Stack>
   );
